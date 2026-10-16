@@ -1,0 +1,48 @@
+import pandas as pd
+import streamlit as st
+from database import add_student_to_db, get_students_from_db
+from services import calculate_grade, calculate_statistics
+
+st.set_page_config(
+    page_title="Student Performance Dashboard", page_icon="🎓", layout="wide"
+)
+
+st.title("🎓 Student Performance Dashboard")
+st.write("Bu panel vasitəsilə tələbə nəticələrini qeyd edə və izləyə bilərsiniz.")
+
+st.sidebar.header("Yeni Tələbə Əlavə Et")
+student_name = st.sidebar.text_input("Tələbənin Adı və Soyadı")
+student_score = st.sidebar.number_input(
+    "Qiymət (0 - 100)", min_value=0.0, max_value=100.0, step=1.0
+)
+
+if st.sidebar.button("Əlavə Et"):
+  if student_name.strip() == "":
+    st.sidebar.error("Zəhmət olmasa tələbə adını daxil edin!")
+  else:
+    calculated_grade = calculate_grade(student_score)
+    add_student_to_db(student_name, student_score, calculated_grade)
+    st.sidebar.success(f"{student_name} uğurla əlavə edildi!")
+    st.rerun()
+
+raw_data = get_students_from_db()
+
+if raw_data:
+  df = pd.DataFrame(raw_data, columns=["Name", "Score", "Grade"])
+  st.subheader("📊 Mövcud Tələbə Nəticələri")
+
+  search_query = st.text_input("🔍 Tələbə axtar (Adına görə):")
+  if search_query:
+    df = df[df["Name"].str.contains(search_query, case=False, na=False)]
+
+  st.dataframe(df, use_container_width=True)
+
+  stats = calculate_statistics(raw_data)
+  st.subheader("📈 Statistika")
+  col1, col2, col3, col4 = st.columns(4)
+  col1.metric("Total Students", stats["total"])
+  col2.metric("Average Score", stats["average"])
+  col3.metric("Highest Score", stats["highest"])
+  col4.metric("Lowest Score", stats["lowest"])
+else:
+  st.info("Hələ ki, verilənlər bazasında heç bir tələbə qeydiyyatı yoxdur.")

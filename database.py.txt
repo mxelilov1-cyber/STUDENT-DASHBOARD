@@ -1,0 +1,35 @@
+import pyodbc
+from config import DB_CONNECTION_STRING
+
+
+def create_connection():
+  try:
+    connection = pyodbc.connect(DB_CONNECTION_STRING)
+    return connection
+  except Exception as e:
+    print(f"Bağlantı xətası: {e}")
+    return None
+
+
+def add_student_to_db(name: str, score: float, grade: str):
+  connection = create_connection()
+  if connection:
+    cursor = connection.cursor()
+    query = "INSERT INTO Students (Name, Score, Grade) VALUES (?, ?, ?)"
+    cursor.execute(query, (name, score, grade))
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+
+def get_students_from_db():
+  connection = create_connection()
+  if connection:
+    cursor = connection.cursor()
+    query = "SELECT Name, Score, Grade FROM Students"
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return rows
+  return []

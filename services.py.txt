@@ -1,0 +1,29 @@
+def calculate_grade(score: float) -> str:
+  if score >= 91:
+    return "A"
+  elif score >= 85:
+    return "B"
+  elif score >= 72:
+    return "C"
+  elif score >= 63:
+    return "D"
+  else:
+    return "F"
+
+
+def calculate_statistics(students_list):
+  if not students_list:
+    return {"total": 0, "average": 0.0, "highest": 0, "lowest": 0}
+
+  scores = [student[1] for student in students_list]
+  total_students = len(scores)
+  average_score = round(sum(scores) / total_students, 1)
+  highest_score = max(scores)
+  lowest_score = min(scores)
+
+  return {
+      "total": total_students,
+      "average": average_score,
+      "highest": highest_score,
+      "lowest": lowest_score,
+  }
