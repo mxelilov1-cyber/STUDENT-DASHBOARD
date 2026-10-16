@@ -1,0 +1,12 @@
+CREATE DATABASE UniversityDB;
+GO
+
+USE UniversityDB;
+GO
+
+CREATE TABLE Students (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Score FLOAT NOT NULL,
+    Grade VARCHAR(5) NOT NULL
+);
